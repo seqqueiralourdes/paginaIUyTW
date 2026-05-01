@@ -9,7 +9,7 @@ if ('serviceWorker' in navigator) {
 
 // URL de la función serverless
 // Por ahora apunta a local, después la cambiamos por la URL de Google Cloud
-const API_URL = 'http://127.0.0.1:8080';
+const API_URL = 'https://country-api-buu5.onrender.com';
 
 // Función para cargar los datos del country
 async function cargarDatos() {

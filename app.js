@@ -8,36 +8,63 @@ if ('serviceWorker' in navigator) {
 }
 
 // URL de la función serverless
-// Por ahora apunta a local, después la cambiamos por la URL de Google Cloud
 const API_URL = 'https://country-api-buu5.onrender.com';
 
-// Función para cargar los datos del country
-async function cargarDatos() {
-  try {
-    const respuesta = await fetch(API_URL);
-    const datos = await respuesta.json();
+// Función para mostrar los datos en pantalla
+function mostrarDatos(datos) {
+  const listaAvisos = document.getElementById('lista-avisos');
+  if (listaAvisos) {
+    listaAvisos.innerHTML = '';
+    datos.avisos.forEach(aviso => {
+      const item = document.createElement('li');
+      item.textContent = aviso;
+      listaAvisos.appendChild(item);
+    });
+  }
 
-    // Mostrar avisos
-    const listaAvisos = document.getElementById('lista-avisos');
-    if (listaAvisos) {
-      listaAvisos.innerHTML = '';
-      datos.avisos.forEach(aviso => {
-        const item = document.createElement('li');
-        item.textContent = aviso;
-        listaAvisos.appendChild(item);
-      });
-    }
-
-    // Mostrar expensas
-    const estadoExpensas = document.getElementById('estado-expensas');
-    if (estadoExpensas) {
-      estadoExpensas.textContent = `Estado: ${datos.expensas.estado} | Monto: $${datos.expensas.monto} | Vencimiento: ${datos.expensas.vencimiento}`;
-    }
-
-  } catch (error) {
-    console.log('Error al cargar datos:', error);
+  const estadoExpensas = document.getElementById('estado-expensas');
+  if (estadoExpensas) {
+    estadoExpensas.textContent = `Estado: ${datos.expensas.estado} | Monto: $${datos.expensas.monto} | Vencimiento: ${datos.expensas.vencimiento}`;
   }
 }
 
-// Cargar datos cuando la página esté lista
+// Función principal para cargar datos
+async function cargarDatos() {
+  try {
+    // Intentar obtener datos de la API
+    const respuesta = await fetch(API_URL);
+    const datos = await respuesta.json();
+
+    // Guardar en localStorage para uso offline
+    localStorage.setItem('country-datos', JSON.stringify(datos));
+    localStorage.setItem('country-fecha', new Date().toLocaleString());
+
+    mostrarDatos(datos);
+
+  } catch (error) {
+    // Sin conexión: usar datos guardados
+    console.log('Sin conexión, usando datos en caché local');
+
+    const datosGuardados = localStorage.getItem('country-datos');
+    const fechaGuardada = localStorage.getItem('country-fecha');
+
+    if (datosGuardados) {
+      const datos = JSON.parse(datosGuardados);
+      mostrarDatos(datos);
+
+      // Avisar al usuario que los datos son del caché
+      const aviso = document.createElement('p');
+      aviso.style.cssText = 'color: #e67e22; font-size: 13px; text-align: center; margin-top: 8px;';
+      aviso.textContent = `Sin conexión. Mostrando datos guardados del ${fechaGuardada}.`;
+      document.querySelector('.dashboard').appendChild(aviso);
+    } else {
+      // No hay datos guardados
+      const listaAvisos = document.getElementById('lista-avisos');
+      if (listaAvisos) listaAvisos.innerHTML = '<li>Sin conexión y sin datos guardados.</li>';
+      const estadoExpensas = document.getElementById('estado-expensas');
+      if (estadoExpensas) estadoExpensas.textContent = 'Sin conexión. Conectate para ver tus expensas.';
+    }
+  }
+}
+
 window.addEventListener('load', cargarDatos);

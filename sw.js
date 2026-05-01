@@ -1,16 +1,15 @@
-const CACHE_NAME = 'country-app-v5';
+const CACHE_NAME = 'country-app-v6';
 
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  'https://seqqueiralourdes.github.io/paginaIUyTW/',
+  'https://seqqueiralourdes.github.io/paginaIUyTW/index.html',
+  'https://seqqueiralourdes.github.io/paginaIUyTW/styles.css',
+  'https://seqqueiralourdes.github.io/paginaIUyTW/app.js',
+  'https://seqqueiralourdes.github.io/paginaIUyTW/manifest.json',
+  'https://seqqueiralourdes.github.io/paginaIUyTW/icons/icon-192.png',
+  'https://seqqueiralourdes.github.io/paginaIUyTW/icons/icon-512.png'
 ];
 
-// Instalar y guardar en caché los archivos esenciales
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,7 +18,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activar y limpiar caché viejo
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -31,7 +29,6 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Estrategia: red primero, caché como respaldo
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
@@ -43,7 +40,7 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         return caches.match(event.request)
-          .then(response => response || caches.match('/index.html'));
+          .then(response => response || caches.match('https://seqqueiralourdes.github.io/paginaIUyTW/index.html'));
       })
   );
 });

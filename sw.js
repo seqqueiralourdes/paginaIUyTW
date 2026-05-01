@@ -1,18 +1,21 @@
-const CACHE_NAME = 'country-app-v4';
+const CACHE_NAME = 'country-app-v5';
 
 const ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
-  '/manifest.json'
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
 ];
 
-// Instalar y guardar en caché
+// Instalar y guardar en caché los archivos esenciales
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -24,11 +27,11 @@ self.addEventListener('activate', event => {
         keys.filter(key => key !== CACHE_NAME)
             .map(key => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
 });
 
-// Interceptar requests (offline)
+// Estrategia: red primero, caché como respaldo
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
